@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>圆形图片裁剪器</title>
+    <style>
+        #imagePreview {
+            border: 2px solid #ccc;
+            position: relative;
+            margin-bottom: 20px;
+            max-width: 500px;
+            max-height: 500px;
+        }
+
+        #imagePreview img {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        #cropArea {
+            position: absolute;
+            cursor: move;
+            border: 2px dashed #ff0000;
+            background-color: rgba(255, 0, 0, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #downloadButton {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>圆形图片裁剪器</h1>
+
+<input type="file" id="uploadInput" accept="image/*">
+<div id="imagePreview"></div>
+<button id="downloadButton" disabled>下载裁剪后的图片</button>
+
+<script>
+    var imagePreview = document.getElementById('imagePreview');
+    var downloadButton = document.getElementById('downloadButton');
+    var uploadedImage = null;
+    var croppedImage = null;
+    var cropArea = null;
+    var isCropping = false;
+    var cropCenterX = 0;
+    var cropCenterY = 0;
+    var cropRadius = 0;
+    var zoom = 1;
+    var originWidth = 0;
+    var originHeight = 0;
+
+    function displayImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                var image = new Image();
+                image.src = e.target.result;
+
+                image.onload = function() {
+                    console.log("width is:"+ image.width);
+                    console.log("height is:"+ image.height);
+                    originWidth = image.width;
+                    originHeight = image.height;
+                    imagePreview.innerHTML = '';
+                    imagePreview.appendChild(image);
+                    uploadedImage = image;
+
+                    var maxWidth = 500;
+                    var maxHeight = 500;
+                    var width = image.width;
+                    var height = image.height;
+
+                    if (width > maxWidth || height > maxHeight) {
+                        if (width / height > maxWidth / maxHeight) {
+                            zoom = originWidth/maxWidth;
+                            width = maxWidth;
+                            height = width * (image.height / image.width);
+                        } else {
+                            zoom = originHeight/maxHeight;
+                            height = maxHeight;
+                            width = height * (image.width / image.height);
+                        }
+                    }
+
+                    imagePreview.style.width = width + 'px';
+                    imagePreview.style.height = height + 'px';
+
+                    enableCrop();
+                };
+
+                image.onerror = function() {
+                    console.log('无法加载图片');
+                };
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function enableCrop() {
+        cropArea = document.createElement('div');
+        cropArea.id = 'cropArea';
+        imagePreview.appendChild(cropArea);
+
+        imagePreview.addEventListener('mousedown', handleMouseDown);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        downloadButton.disabled = false;
+        downloadButton.style.display = 'block';
+    }
+
+    function handleMouseDown(event) {
+        isCropping = true;
+        cropCenterX = event.pageX - imagePreview.offsetLeft;
+        cropCenterY = event.pageY - imagePreview.offsetTop;
+    }
+
+    function handleMouseMove(event) {
+        if (isCropping) {
+            var offsetX = event.pageX - imagePreview.offsetLeft - cropCenterX;
+            var offsetY = event.pageY - imagePreview.offsetTop - cropCenterY;
+
+            cropRadius = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+
+            cropArea.style.left = cropCenterX + 'px';
+            cropArea.style.top = cropCenterY + 'px';
+            cropArea.style.width = 2 * cropRadius + 'px';
+            cropArea.style.height = 2 * cropRadius + 'px';
+        }
+    }
+
+    function handleMouseUp(event) {
+        if (isCropping) {
+            isCropping = false;
+
+            cropImage();
+        }
+    }
+
+    function cropImage() {
+        if (uploadedImage) {
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+
+            var zoomCropRadius = cropRadius*zoom;
+            canvas.width = 2 * zoomCropRadius;
+            canvas.height = 2 * zoomCropRadius;
+
+            context.beginPath();
+
+            context.arc(zoomCropRadius, zoomCropRadius, zoomCropRadius, 0, 2 * Math.PI);
+            context.clip();
+
+            var zoomCropCenterX = cropCenterX*zoom;
+            var zoomCropCenterY = cropCenterY*zoom;
+
+            context.drawImage(uploadedImage, zoomCropCenterX - zoomCropRadius, zoomCropCenterY - zoomCropRadius, 2 * zoomCropRadius, 2 * zoomCropRadius, 0, 0, 2 * zoomCropRadius, 2 * zoomCropRadius);
+
+            croppedImage = canvas.toDataURL();
+
+            imagePreview.innerHTML = '';
+            var image = new Image();
+            image.src = croppedImage;
+            imagePreview.appendChild(image);
+        }
+    }
+
+    function downloadImage() {
+        if (croppedImage) {
+            var link = document.createElement('a');
+            link.href = croppedImage;
+            link.download = 'cropped_image.png';
+            link.click();
+        }
+    }
+
+    var uploadInput = document.getElementById('uploadInput');
+    uploadInput.addEventListener('change', function() {
+        displayImage(uploadInput);
+    });
+
+    downloadButton.addEventListener('click', function() {
+        downloadImage();
+    });
+</script>
+</body>
+</html>
