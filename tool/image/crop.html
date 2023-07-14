@@ -6,12 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>圆形图片裁剪器</title>
     <style>
+        body, html {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #container {
+            text-align: center;
+        }
+
         #imagePreview {
             border: 2px solid #ccc;
             position: relative;
             margin-bottom: 20px;
             max-width: 500px;
             max-height: 500px;
+            display: inline-block;
+            vertical-align: middle;
         }
 
         #imagePreview img {
@@ -20,27 +33,26 @@
             max-height: 100%;
         }
 
-        #cropArea {
-            position: absolute;
-            cursor: move;
-            border: 2px dashed #ff0000;
-            background-color: rgba(255, 0, 0, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
+        #uploadInput {
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 20px;
         }
 
         #downloadButton {
-            display: none;
+            display: block;
+            margin: 0 auto;
             margin-top: 10px;
         }
     </style>
 </head>
 <body>
-<h1>圆形图片裁剪器</h1>
-
-<input type="file" id="uploadInput" accept="image/*">
-<div id="imagePreview"></div>
-<button id="downloadButton" disabled>下载裁剪后的图片</button>
+    <div id="container">
+        <h1>圆形图片裁剪器</h1>
+        <input type="file" id="uploadInput" accept="image/*">
+        <div id="imagePreview"></div>
+        <button id="downloadButton" disabled>下载裁剪后的图片</button>
+    </div>
 
 <script>
     var imagePreview = document.getElementById('imagePreview');
@@ -87,6 +99,12 @@
                             zoom = originHeight/maxHeight;
                             height = maxHeight;
                             width = height * (image.width / image.height);
+                        }
+                    }else {
+                        if(width === maxWidth) {
+                            zoom = originWidth/width;
+                        }else {
+                            zoom = originHeight/height;
                         }
                     }
 
