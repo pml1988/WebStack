@@ -57,58 +57,61 @@
     var originWidth = 0;
     var originHeight = 0;
 
-    function displayImage(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
+    function loadImage(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var image = new Image();
+            image.src = e.target.result;
 
-            reader.onload = function(e) {
-                var image = new Image();
-                image.src = e.target.result;
+            image.onload = function() {
+                console.log("width is:"+ image.width);
+                console.log("height is:"+ image.height);
+                originWidth = image.width;
+                originHeight = image.height;
+                imagePreview.innerHTML = '';
+                imagePreview.appendChild(image);
+                uploadedImage = image;
 
-                image.onload = function() {
-                    console.log("width is:"+ image.width);
-                    console.log("height is:"+ image.height);
-                    originWidth = image.width;
-                    originHeight = image.height;
-                    imagePreview.innerHTML = '';
-                    imagePreview.appendChild(image);
-                    uploadedImage = image;
+                var maxWidth = 500;
+                var maxHeight = 500;
+                var width = image.width;
+                var height = image.height;
 
-                    var maxWidth = 500;
-                    var maxHeight = 500;
-                    var width = image.width;
-                    var height = image.height;
-
-                    if (width > maxWidth || height > maxHeight) {
-                        if (width / height > maxWidth / maxHeight) {
-                            zoom = originWidth/maxWidth;
-                            width = maxWidth;
-                            height = width * (image.height / image.width);
-                        } else {
-                            zoom = originHeight/maxHeight;
-                            height = maxHeight;
-                            width = height * (image.width / image.height);
-                        }
-                    }else {
-                        if(width === maxWidth) {
-                            zoom = originWidth/width;
-                        }else {
-                            zoom = originHeight/height;
-                        }
+                if (width > maxWidth || height > maxHeight) {
+                    if (width / height > maxWidth / maxHeight) {
+                        zoom = originWidth/maxWidth;
+                        width = maxWidth;
+                        height = width * (image.height / image.width);
+                    } else {
+                        zoom = originHeight/maxHeight;
+                        height = maxHeight;
+                        width = height * (image.width / image.height);
                     }
+                }else {
+                    if(width === maxWidth) {
+                        zoom = originWidth/width;
+                    }else {
+                        zoom = originHeight/height;
+                    }
+                }
 
-                    imagePreview.style.width = width + 'px';
-                    imagePreview.style.height = height + 'px';
+                imagePreview.style.width = width + 'px';
+                imagePreview.style.height = height + 'px';
 
-                    enableCrop();
-                };
-
-                image.onerror = function() {
-                    console.log('无法加载图片');
-                };
+                enableCrop();
             };
 
-            reader.readAsDataURL(input.files[0]);
+            image.onerror = function() {
+                console.log('无法加载图片');
+            };
+        };
+        reader.readAsDataURL(file);
+    }
+
+
+    function displayImage(input) {
+        if (input.files && input.files[0]) {
+            loadImage(input.files[0]);
         }
     }
 
@@ -190,6 +193,16 @@
         }
     }
 
+    function handlePaste(event) {
+        var items = event.clipboardData.items;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                var file = items[i].getAsFile();
+                loadImage(file);
+            }
+        }
+    }
+
     var uploadInput = document.getElementById('uploadInput');
     uploadInput.addEventListener('change', function() {
         displayImage(uploadInput);
@@ -197,6 +210,11 @@
 
     downloadButton.addEventListener('click', function() {
         downloadImage();
+    });
+
+    // 监听粘贴事件
+    document.addEventListener('paste', function(event) {
+        handlePaste(event);
     });
 </script>
 </body>
