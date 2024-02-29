@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function getHeaders(name) {
+            console.log("now get headers name=" + name);
+            return {
+                pml:'OOOO',
+                fff:'fdsafadsfdsafadsf'
+            };
+        }
+    </script>
+</head>
+<body>
+<h1>Demo Custom Tags</h1>
+<!--<iframe is="header-iframe" url="/404.html" headers = "{pml:pml,hello:hehhh}"></iframe>-->
+
+<iframe is="header-iframe" url="/404.html" headers = "getHeaders(12)"></iframe>
+<!--<iframe is="header-iframe" url="/404.html" headers = "{'pml':'pml'}"></iframe>-->
+<br />
+<br />
+<br />
+<br />
+<br />
+<a is="header-anchor" url="/404.html" href="" headers = "getHeaders(12)">fdsafdsa</a>
+<br />
+<br />
+<br />
+<br />
+<br />
+<!--<a is="uc-confirm-link" href="https://www.baidu.com">uc-confirm-link</a>-->
+<!--<br />-->
+<!--<br />-->
+<!--<br />-->
+<!--<br />-->
+<!--<br />-->
+<!--<iframe src="https://www.baidu.com"  ></iframe>-->
+<!--<br />-->
+<!--<br />-->
+<!--<br />-->
+<!--<br />-->
+<!--<br />-->
+<!--<codingdude-gravatar email="devop@coding-dude.com"></codingdude-gravatar>-->
+<!--<script src="../../assets/js/customTag.js"></script>-->
+<script src="../../assets/js/customTag.js"></script>
+
+</body>
+</html>

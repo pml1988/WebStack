@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open New Window with Headers</title>
+</head>
+<body>
+
+<a href="/tool/customTag/customTag.html" id="authLink" onclick="openWindowWithHeaders('/tool/customTag/customTag.html'); return false;">Jump with auth info header</a>
+
+<script>
+  function openWindowWithHeaders(url) {
+    // Headers to include in the request
+    const headers = new Headers({
+      'Authorization': 'Bearer 12345678'
+    });
+
+    // Fetch options, including method and headers
+    const options = {
+      method: 'GET',
+      headers: headers
+    };
+
+    // Open a new window or tab
+    const newWindow = window.open();
+
+    // Make the fetch request
+    fetch(url, options)
+            .then(response => response.text())
+            .then(responseText => {
+              console.log("responseText is:" + responseText);
+              // Write the response content to the new window or tab
+              newWindow.document.write(responseText);
+            })
+            .catch(error => {
+              // Handle errors
+              console.error('Error:', error);
+            });
+  }
+</script>
+
+</body>
+</html>

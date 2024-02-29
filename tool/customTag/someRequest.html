@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Demo</title>
+</head>
+<body>
+
+<script>
+  // Set a cookie
+  document.cookie = "myCookie=myCookieValue; path=/;";
+  var requestCurrentDomainPage = '/WebStack/tool/customTag/custom.html';
+  // Retrieve and display the cookie
+  const storedCookie = document.cookie;
+  console.log("Stored Cookie:", storedCookie);
+
+  // fetch(requestCurrentDomainPage)
+  //         .then(response => response.text())
+  //         .then(data => console.log("Data from Server:", data))
+  //         .catch(error => console.error('Error:', error));
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', requestCurrentDomainPage);
+  xhr.withCredentials = true;
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === this.DONE && xhr.status === 200) {
+       console.log(xhr.responseText);
+    }
+  };
+  xhr.send();
+
+</script>
+
+</body>
+</html>
