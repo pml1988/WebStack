@@ -41,6 +41,20 @@
     margin-bottom: 0px;
     margin-right: 15px;
 }
+
+.xe-note-comment {
+    transform: translateY(-50%);
+    position: absolute;
+    margin-left: 10px;
+    top: 50%;
+}
+.xe-note-comment p {
+    margin-bottom: 0px;
+    margin-right: 15px;
+}
+
+
+
 .overflowClip_1 {
     overflow: hidden;
     text-overflow: ellipsis;
